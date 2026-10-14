@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Document Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar">
+      <nav class="document-list" id="documentList">
+        {% for doc in documents %}
+        <a class="document-link {% if doc.name == selected %}active{% endif %}" href="{{ url_for('index', doc=doc.name) }}" data-name="{{ doc.name|lower }}">
+          <span class="document-number">{{ loop.index }}</span>
+          <span class="document-name" title="{{ doc.name }}">{{ doc.name }}</span>
+        </a>
+        {% endfor %}
+        <div class="no-results" id="noResults" hidden>No documents found</div>
+      </nav>
+    </aside>
+    <main class="main-area">
+      <header class="topbar">
+        <form action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+          <input type="file" name="documents" id="fileInput" multiple accept=".docx,.md,.markdown,.txt,.py,.sql,.js,.ts,.java,.json,.yaml,.yml,.html,.css,.xml,.csv,.log" hidden>
+          <button class="add-button" type="button" id="addButton">＋ Add documents</button>
+        </form>
+        <button class="theme-button" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme"><span id="themeIcon">☾</span></button>
+      </header>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<div class="flash-stack">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}
+      {% endwith %}
+      <section class="reader-scroll">
+        <article class="document-content">{{ content|safe }}</article>
+      </section>
+    </main>
+  </div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script>if (window.mermaid) { mermaid.initialize({ startOnLoad: true, theme: 'dark' }); }</script>
+</body>
+</html>
